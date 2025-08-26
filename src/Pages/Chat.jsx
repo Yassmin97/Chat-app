@@ -1,4 +1,4 @@
-import SideNav from '../components/SideNav';
+import SideNav from '../Components/SideNav';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -54,8 +54,16 @@ const Chat = () => {
         }
       );
 
+    const myMessage = {
+      id: Data.now(), text,
+      username: user.username,
+      userId: user.id,
+      avatar: user.avatar || `https://i.pravatar.cc/150?u=${user.id}`, };
+    
+    setMessages((prev) => [...preview, myMessage]);
+    botReply(text);
+
       setText('');
-      fetchMessages();
     } catch (err) {
       console.error('Fel vid skickande:', err.response?.data || err);
     }
@@ -88,6 +96,41 @@ const Chat = () => {
     }
   };
 
+  const botReply = (userMessage) => {
+    const lower = userMessage.toLowerCase();
+    let response;
+
+    if (lower.includes("hej")) {
+      response = "Hej! Hur mår du idag? 😊";
+    }else if (lower.includes("hur mår du")) {
+      response = "Jag mår bra, tack för frågan🤖!";
+    }else if (lower.includes("hejdå") || lower.includes("bye")){
+      response = "Hejdå👋 vi ses snart!";
+    }else {
+      const randomeResponse = [
+       "Det låter intressant! 😃",
+       "Berätta mer? 🤔",
+       "Haha, det där var roligt 😂",
+       "Du skojar 😂",
+       "Okej, spännande! 👍", 
+      ];
+      response = randomeResponse[Math.floor(Math.random() * randomeResponse.length)];
+    }
+    
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev, {
+          id: Data.now(),
+          text: response,
+          username: "Vän",
+          userId: 999,
+          avatar: "https://i.pravatar.cc/150?u=999",
+        },
+      ]);
+    }, 1000);
+    };
+  
+
   useEffect(() => {
     if (token) {
     fetchMessages();
@@ -107,7 +150,7 @@ const Chat = () => {
       ></div>
       <div className='relative z-20 p-6'>
       <div className="flex items-center gap-3 mb-6 justify-center">
-          <h2 className="text-3xl font-semibold text-black drop-shadow">
+          <h2 className="text-3xl font-semibold" style={{ color:"#5A314E"}}>
             Hej {user.username || ""}
           </h2>
         </div>
@@ -130,7 +173,7 @@ const Chat = () => {
             isMine ? 'bg-white text-black' : 'bg-gray-200 text-black'
       }`}>
     
-      <p className="text-sm font-semibold">{msg.user?.username || "Yas"}</p>
+      <p className="text-sm font-semibold">{msg.username || msg.user?.username || user.username}</p>
       <p>{msg.text || msg.content}</p>
 
       {isMine && (
@@ -146,7 +189,6 @@ const Chat = () => {
 )})}
 </div>
 
-        {/* Input */}
         <form onSubmit={sendMessage} className="flex gap-2">
           <input
             type="text"
@@ -157,8 +199,7 @@ const Chat = () => {
           />
           <button
             type="submit"
-            className="bg-yellow-400 text-red-600 font-bold px-4 py-2 rounded hover:bg-blue-800"
-          >
+            className="font-semibold px-4 py-2 rounded" style={{ backgroundColor:"#5A314E", color:"#fff"}}>
             Skicka
           </button>
         </form>

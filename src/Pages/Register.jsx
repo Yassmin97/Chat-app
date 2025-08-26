@@ -47,15 +47,17 @@ const Register = () => {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-white via-blue-50 to-white">
+        <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{
+          backgroundImage: "url('/bakgrund.jpg')",}}>
             <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-blue-100">
-            <h2 className="text-2xl font-semibold mb-6 text-center text-blue-800">Registrera</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-center" style={{ color:"#5A314E"}}>Registrera</h2>
 
             <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-sm">
                 <input type="text" name="username" placeholder="Användarnamn" onChange={handleChange} required className="w-full p-3 mb-3 border rounded focus-outline-one focus:ring-1 focus:ring-blue-500" />
                 <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-3 mb-3 border rounded focus-outline-one focus:ring-1 focus:ring-blue-500"/>
                 <input type="password" name="password" placeholder="Lösenord" onChange={handleChange} required className="w-full p-3 mb-3 border rounded focus-outline-one focus:ring-1 focus:ring-blue-500"/>
-                <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 mt-6 rounded-lg hover:bg-blue-700">Registrera</button>
+                <button type="submit" className="w-full text-white font-semibold py-2 mt-6 rounded-lg" style={{ backgroundColor: "#5A314E" }} onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#5066C7")}
+  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#5A314E")}>Registrera</button>
         </form>
 
         <p className="text-center mt-4">

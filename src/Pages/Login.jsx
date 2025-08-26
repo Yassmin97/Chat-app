@@ -60,23 +60,17 @@ const Login = () => {
 
 
 return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from white via-blue-50 to-white">
-        {/* <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url('/bakgrund.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}   
-      ></div>*/}
-        <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-blue-100">
-          
-        <h2 className="text-2xl font-semibold text-center text-blue-800 mb-6">Logga in</h2>
+    <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{
+          backgroundImage: "url('/bakgrund.jpg')",}}>
+
+        <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-blue-100">          
+        <h2 className="text-2xl font-bold text-center mb-6" style={{ color:"#5A314E"}}>Logga in</h2>
 
         <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-sm">
             <input type="text" name="username" placeholder="Användarnamn" onChange={handleChange} required className="w-full p-3 border focus:outline-none focus:ring-1 focus:ring-blue-500 "/>
             <input type="password" name="password" placeholder="Lösenord" onChange={handleChange} required className="w-full p-3 border focus:outline-none focus:ring-1 focus:ring-blue-500 mt-6 "/>
-            <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 mt-10 rounded-lg hover:bg-blue-700 transition">Logga in</button>
+            <button type="submit" className="w-full text-white font-semibold py-2 mt-10 rounded-lg transition" style={{ backgroundColor: "#5A314E" }} onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#5066C7")}
+  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#5A314E")}>Logga in</button>
         </form>
 
         <p className="text-center mt-4">
