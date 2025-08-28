@@ -1,5 +1,5 @@
 import SideNav from '../Components/SideNav';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
 const Chat = () => {
@@ -7,62 +7,57 @@ const Chat = () => {
   const [text, setText] = useState('');
   const user = JSON.parse(localStorage.getItem('user'));
   const token = localStorage.getItem('token');
-
+  const messagesEndRef = useRef(null);
 
   if (!user || !token) {
     window.location.href = "/login";
     return null;
   }
-  // Hämta alla messages
+  // Hämta alla meddelande
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
         'https://chatify-api.up.railway.app/messages',
         {
-          headers: { Authorization: `Bearer ${token}` }, withCredentials: true,
-        }
-      );
-      console.log("Fetched messages:", res.data);
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      
       setMessages(res.data);
+      localStorage.setItem("messages", JSON.stringify(res.data));
     } catch (err) {
       console.error('Fel vid hämtning av meddelande:', err);
     }
   };
 
-  // Skapa nytt meddelande
+  // skicka nytt meddelande
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;
 
     try {
       const csrfRes = await axios.patch(
-        'https://chatify-api.up.railway.app/csrf',
-        {},
-        { withCredentials: true }
-      );
-      const csrfToken = csrfRes.data.csrfToken;
+      "https://chatify-api.up.railway.app/csrf",
+      {},
+      { withCredentials: true }
+    );
+    const csrfToken = csrfRes.data.csrfToken;
 
-      await axios.post(
+     const response = await axios.post(
         'https://chatify-api.up.railway.app/messages',
         { text },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            'X-CSRF-TOKEN': csrfToken,
-          },
-          withCredentials: true,
-        }
-      );
+            Authorization: `Bearer ${token}`},
+        });
 
-    const myMessage = {
-      id: Data.now(), text,
-      username: user.username,
-      userId: user.id,
-      avatar: user.avatar || `https://i.pravatar.cc/150?u=${user.id}`, };
-    
-    setMessages((prev) => [...preview, myMessage]);
-    botReply(text);
+    const savedMessage = response.data;
+    setMessages((prev) => {
+      const updated = [...prev, savedMessage];
+      localStorage.setItem("messages", JSON.stringify(updated));
+      return updated;
+    });
 
+      botReply();
       setText('');
     } catch (err) {
       console.error('Fel vid skickande:', err.response?.data || err);
@@ -72,69 +67,57 @@ const Chat = () => {
   // Radera ett meddelande
   const deleteMessage = async (id) => {
     try {
-      const csrfRes = await axios.patch(
-        'https://chatify-api.up.railway.app/csrf',
-        {},
-        { withCredentials: true }
-      );
-      const csrfToken = csrfRes.data.csrfToken;
-
       await axios.delete(
         `https://chatify-api.up.railway.app/messages/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            'X-CSRF-TOKEN': csrfToken,
-          },
-          withCredentials: true,
-        }
-      );
+            Authorization: `Bearer ${token}`, },
+        });
 
-      fetchMessages();
+      const updated = messages.filter((m) => m.id !== id);
+      setMessages(updated);
+      localStorage.setItem("messages", JSON.stringify(updated));
+     
     } catch (err) {
       console.error('Fel vid radering:', err.response?.data || err);
     }
   };
 
-  const botReply = (userMessage) => {
-    const lower = userMessage.toLowerCase();
-    let response;
-
-    if (lower.includes("hej")) {
-      response = "Hej! Hur mår du idag? 😊";
-    }else if (lower.includes("hur mår du")) {
-      response = "Jag mår bra, tack för frågan🤖!";
-    }else if (lower.includes("hejdå") || lower.includes("bye")){
-      response = "Hejdå👋 vi ses snart!";
-    }else {
-      const randomeResponse = [
-       "Det låter intressant! 😃",
-       "Berätta mer? 🤔",
-       "Haha, det där var roligt 😂",
-       "Du skojar 😂",
-       "Okej, spännande! 👍", 
-      ];
-      response = randomeResponse[Math.floor(Math.random() * randomeResponse.length)];
-    }
+  const botReply = () => {
+    const response = [
+      "Hej! Hur mår du idag? 😊",
+      "Det låter intressant! 😃",
+      "Berätta mer? 🤔",
+      "Haha, det där var roligt 😂",
+      "Du skojar 😂",
+      "Okej, spännande! 👍"
+    ];
     
     setTimeout(() => {
-      setMessages((prev) => [
-        ...prev, {
-          id: Data.now(),
-          text: response,
-          username: "Vän",
+      const botMessage = {
+          id: Date.now(),
+          text: response[Math.floor(Math.random() * response.length)],
+          username: "Leen",
           userId: 999,
           avatar: "https://i.pravatar.cc/150?u=999",
-        },
-      ]);
-    }, 1000);
-    };
+        };
+      
+          const updated = [...messages, botMessage];
+          setMessages(updated);
+          localStorage.setItem("messages", JSON.stringify(updated));
+          return updated;
+    }, 1000);};
   
+      useEffect(() => {
+          if (messagesEndRef.current)  {
+          messagesEndRef.current.scrollIntoView({behavior: "smooth"});
+      }
+      }, [messages]);
 
-  useEffect(() => {
-    if (token) {
-    fetchMessages();
-  } }, [token]);
+      //hämta server meddelande
+      useEffect(() => {
+        fetchMessages();
+    }, [])
 
   return (
     <div className="flex min-h-screen">
@@ -148,48 +131,57 @@ const Chat = () => {
           backgroundPosition: "center",
         }}
       ></div>
-      <div className='relative z-20 p-6'>
+      <div className='relative z-20 p-6 flex flex-col h-screen'>
       <div className="flex items-center gap-3 mb-6 justify-center">
-          <h2 className="text-3xl font-semibold" style={{ color:"#5A314E"}}>
-            Hej {user.username || ""}
+          <h2 className="text-3xl font-semibold text-[#5A314E]">
+            Hej {user.username}
           </h2>
         </div>
 
         {/* Messages */}
         <div className="space-y-4 max-h-[60vh] overflow-y-auto mb-4">
           {messages.map((msg) => {
-            const isMine = msg.userId === user.id || msg.username === user.username;
-            return (
-        <div
-            key={msg.id || msg.messageId}
-            className={`flex items-end gap-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
+            const isMine = msg.userId === user.id;
+            const avatarSrc = isMine ? (msg.avatar || user.avatar || `https://i.pravatar.cc/150?u=${user.id}`)
+            : (msg.avatar || `https://i.pravatar.cc/150?u=${msg.userId || 'bot'}`);
 
-        {isMine && (
-          <img src={user.avatar || `https://i.pravatar.cc/150?u=${user.id }`} alt="avatar" className="w-12 h-12 mb-6 rounded-full" />
-        )}
+
+        return (
+        <div
+            key={msg.id}
+            className={`flex items-end gap-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
+ 
+        {!isMine && (
+          <img src={avatarSrc} alt="avatar" className="w-12 h-12 rounded-full mb-3" />
+      )}
 
         <div
             className={`p-3 rounded-lg max-w-[70%] ${
             isMine ? 'bg-white text-black' : 'bg-gray-200 text-black'
       }`}>
     
-      <p className="text-sm font-semibold">{msg.username || msg.user?.username || user.username}</p>
-      <p>{msg.text || msg.content}</p>
+      <p className="text-sm font-semibold">{msg.username}</p>
+      <p>{msg.text}</p>
 
       {isMine && (
         <button
-          onClick={() => deleteMessage(msg.id || msg.messageId)}
+          onClick={() => deleteMessage(msg.id)}
           className="text-xs text-pink-600 hover:text-pink-400 mt-1"
         >
           🗑️ Radera
         </button>
       )}
     </div>
-  </div>
-)})}
-</div>
+        {isMine && (
+        <img src={avatarSrc} alt="avatar" className="w-12 h-12 rounded-full mb-6" />
+        )}
 
-        <form onSubmit={sendMessage} className="flex gap-2">
+    </div>
+  )})}
+  <div ref={messagesEndRef} />
+  </div>
+
+        <form onSubmit={sendMessage} className="flex gap-2 fixed left-47 right-5 bottom-15 bg-gray-200 p-2 rounded-t-lg ">
           <input
             type="text"
             value={text}
@@ -199,7 +191,7 @@ const Chat = () => {
           />
           <button
             type="submit"
-            className="font-semibold px-4 py-2 rounded" style={{ backgroundColor:"#5A314E", color:"#fff"}}>
+            className="font-semibold px-4 py-2 rounded bg-[#7A4266] text-white hover:bg-[#5A314E] transition-colors duration-200">
             Skicka
           </button>
         </form>

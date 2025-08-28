@@ -1,4 +1,4 @@
-import SideNav from '../components/SideNav';
+import SideNav from '../Components/SideNav';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -57,24 +57,25 @@ const Profile = () => {
     };
 
     return (
-        <div className='flex bg-white min-h-screen'>
+        <div className='absolute inset-0 z-0' style={{
+          backgroundImage: "url('/bakgrund.jpg')"}}>
             <SideNav />
-            <div className='ml-40 p-6 w-full max-w-xl'>
+            <div className='ml-120 p-6 w-full max-w-xl'>
                 <h2 className='text-2xl font-semibold mb-4'>Min Profile</h2>
                 <form onSubmit={handelUpdate} className='space-y-4'>
                     <div>
-                    <label className='block mb-1 font-medium'>Användarnamn</label>
-                    <input name="username" value={form.username} onChange={handelChange} className='w-full p-2 border rounded' required />
+                    <label className='block mb-1 text-xl'>Användarnamn</label>
+                    <input name="username" value={form.username} onChange={handelChange} className='w-full p-2 border rounded bg-gray-100' required />
                     </div>
 
                     <div>
-                    <label className='block mb-1 font-medium'>Email</label>
-                    <input name="email" value={form.email} onChange={handelChange} placeholder='Din e-post' className='w-full p-2 border rounded' />
+                    <label className='block mb-1 font-medium text-xl'>Email</label>
+                    <input name="email" value={form.email} onChange={handelChange} placeholder='Din e-post' className='w-full p-2 border rounded bg-gray-100' />
                     </div>
 
                     <div>
-                    <label className='block mb-1 font-medium'>Avatar (bild url) </label>
-                    <input name="avatar" value={form.avatar} onChange={handelChange} className='w-full p-2 border rounded'/>
+                    <label className='block mb-1 font-medium text-xl'>Avatar (bild url) </label>
+                    <input name="avatar" value={form.avatar} onChange={handelChange} className='w-full p-2 border rounded bg-gray-100'/>
                     </div>
 
                     {form.avatar && (
@@ -83,13 +84,13 @@ const Profile = () => {
                     </div>
                 )}
 
-                <button type='submit' className='bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-700'>Uppdatera</button>
+                <button type='submit' className='bg-[#5A314E] text-white px-4 py-2 rounded hover:bg-[#5066C7]'>Uppdatera</button>
                 </form>
 
                 {message && <p className='mt-3 text-red-600 font-semibold'>{message}</p>}
                 <hr className='my-6' />
 
-                <button onClick={handleDelete} className='text-red-600 font-semibold hover:text-red-800'>🗑️ Radera mitt konto</button>
+                <button onClick={handleDelete} className='text-[#000000] font-semibold hover:text-white'>🗑️ Radera mitt konto</button>
             </div>
         </div>
     )

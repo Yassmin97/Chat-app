@@ -58,7 +58,6 @@ const Login = () => {
   }
 };
 
-
 return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{
           backgroundImage: "url('/bakgrund.jpg')",}}>
@@ -70,7 +69,7 @@ return (
             <input type="text" name="username" placeholder="Användarnamn" onChange={handleChange} required className="w-full p-3 border focus:outline-none focus:ring-1 focus:ring-blue-500 "/>
             <input type="password" name="password" placeholder="Lösenord" onChange={handleChange} required className="w-full p-3 border focus:outline-none focus:ring-1 focus:ring-blue-500 mt-6 "/>
             <button type="submit" className="w-full text-white font-semibold py-2 mt-10 rounded-lg transition" style={{ backgroundColor: "#5A314E" }} onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#5066C7")}
-  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#5A314E")}>Logga in</button>
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#5A314E")}>Logga in</button>
         </form>
 
         <p className="text-center mt-4">
