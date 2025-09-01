@@ -13,7 +13,7 @@ const Chat = () => {
     window.location.href = "/login";
     return null;
   }
-  // Hämta alla meddelande
+
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
@@ -29,19 +29,11 @@ const Chat = () => {
     }
   };
 
-  // skicka nytt meddelande
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;
 
     try {
-      const csrfRes = await axios.patch(
-      "https://chatify-api.up.railway.app/csrf",
-      {},
-      { withCredentials: true }
-    );
-    const csrfToken = csrfRes.data.csrfToken;
-
      const response = await axios.post(
         'https://chatify-api.up.railway.app/messages',
         { text },
@@ -50,21 +42,21 @@ const Chat = () => {
             Authorization: `Bearer ${token}`},            
         });
 
-    const savedMessage = response.data;
+    const savedMessage = response.data.latestMessage;
+    savedMessage.userId = user.id;
     setMessages((prev) => {
       const updated = [...prev, savedMessage];
       localStorage.setItem("messages", JSON.stringify(updated));
       return updated;
     });
-
-      setText('');
+      
       botReply();
+      setText('');
     } catch (err) {
       console.error('Fel vid skickande:', err.response?.data || err);
     }
   };
 
-  // Radera ett meddelande
   const deleteMessage = async (id) => {
     try {
       await axios.delete(
@@ -118,30 +110,8 @@ const Chat = () => {
 
       
       useEffect(() => {
-        const saved = localStorage.getItem("messages");
-        if (saved){
-          setMessages(JSON.parse(saved))
-        }
-
-        const load = async () => {
-          try {
-            const res = await axios.get(
-              'https://chatify-api.up.railway.app/messages', {
-                headers: {Authorization: `Bearer ${token}`}
-              }
-            )
-        setMessages((prev) => {
-        const ids = new Set(prev.map((m) => m.id));
-        const updated = [...prev, ...res.data.filter((m) => !ids.has(m.id))];
-          localStorage.setItem("messages", JSON.stringify(updated));
-           return updated;
-        });
-      } catch (err) {
-        console.error("fel vid hämtning av meddelande:", err);
-      }
-    };
-        load()
-      }, [token])
+        fetchMessages();
+      }, [])
         
   return (
     <div className="flex min-h-screen">
