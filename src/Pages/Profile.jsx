@@ -21,7 +21,7 @@ const Profile = () => {
             const csrfRes = await axios.patch('https://chatify-api.up.railway.app/csrf', {}, { withCredentials: true});
             const csrfToken = csrfRes.data.csrfToken;
 
-            await axios.put('https://chatify-api.up.railway.app/user', form, { headers: {
+            await axios.put('https://chatify-api.up.railway.app/user', {id: user.id, ...form}, { headers: {
                 Authorization: `Bearer ${token}`,
                 'X-CSRF-TOKEN': csrfToken
             },

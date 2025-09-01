@@ -1,5 +1,5 @@
 import SideNav from '../Components/SideNav';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, cache } from 'react';
 import axios from 'axios';
 
 const Chat = () => {
@@ -47,7 +47,7 @@ const Chat = () => {
         { text },
         {
           headers: {
-            Authorization: `Bearer ${token}`},
+            Authorization: `Bearer ${token}`},            
         });
 
     const savedMessage = response.data;
@@ -57,8 +57,8 @@ const Chat = () => {
       return updated;
     });
 
-      botReply();
       setText('');
+      botReply();
     } catch (err) {
       console.error('Fel vid skickande:', err.response?.data || err);
     }
@@ -100,25 +100,49 @@ const Chat = () => {
           username: "Leen",
           userId: 999,
           avatar: "https://i.pravatar.cc/150?u=999",
-        };
+    };
+
+      setMessages((prev) => {
+        const updated = [...prev, botMessage];
+        localStorage.setItem("messages", JSON.stringify(updated));
+        return updated;
+      });
+    }, 1000);
+  }
       
-          const updated = [...messages, botMessage];
-          setMessages(updated);
-          localStorage.setItem("messages", JSON.stringify(updated));
-          return updated;
-    }, 1000);};
-  
       useEffect(() => {
           if (messagesEndRef.current)  {
           messagesEndRef.current.scrollIntoView({behavior: "smooth"});
       }
       }, [messages]);
 
-      //hämta server meddelande
+      
       useEffect(() => {
-        fetchMessages();
-    }, [])
+        const saved = localStorage.getItem("messages");
+        if (saved){
+          setMessages(JSON.parse(saved))
+        }
 
+        const load = async () => {
+          try {
+            const res = await axios.get(
+              'https://chatify-api.up.railway.app/messages', {
+                headers: {Authorization: `Bearer ${token}`}
+              }
+            )
+        setMessages((prev) => {
+        const ids = new Set(prev.map((m) => m.id));
+        const updated = [...prev, ...res.data.filter((m) => !ids.has(m.id))];
+          localStorage.setItem("messages", JSON.stringify(updated));
+           return updated;
+        });
+      } catch (err) {
+        console.error("fel vid hämtning av meddelande:", err);
+      }
+    };
+        load()
+      }, [token])
+        
   return (
     <div className="flex min-h-screen">
       <SideNav />
@@ -145,8 +169,7 @@ const Chat = () => {
             const avatarSrc = isMine ? (msg.avatar || user.avatar || `https://i.pravatar.cc/150?u=${user.id}`)
             : (msg.avatar || `https://i.pravatar.cc/150?u=${msg.userId || 'bot'}`);
 
-
-        return (
+return (
         <div
             key={msg.id}
             className={`flex items-end gap-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
@@ -197,7 +220,7 @@ const Chat = () => {
         </form>
       </div>
     </div>
-    </div>
+  </div>
   );
 };
 
