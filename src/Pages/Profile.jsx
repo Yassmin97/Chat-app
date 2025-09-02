@@ -6,8 +6,9 @@ import axios from 'axios';
 const Profile = () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
-    const [form, setForm] = useState({username: user.username, email: '', avatar: user.avatar});
+    const [form, setForm] = useState({username: user.username, email: user.email || "", avatar: user.avatar || ""});
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handelChange = e => {
         setForm({...form, [e.target.name]: e.target.value });
@@ -18,14 +19,12 @@ const Profile = () => {
         setMessage('');
 
         try {
-            const csrfRes = await axios.patch('https://chatify-api.up.railway.app/csrf', {}, { withCredentials: true});
-            const csrfToken = csrfRes.data.csrfToken;
+            const csrfRes = await axios.patch('https://chatify-api.up.railway.app/csrf', {});            
 
             await axios.put('https://chatify-api.up.railway.app/user', {id: user.id, ...form}, { headers: {
-                Authorization: `Bearer ${token}`,
-                'X-CSRF-TOKEN': csrfToken
+                Authorization: `Bearer ${token}`,              
             },
-            withCredentials: true
+            
         });
 
         localStorage.setItem('user', JSON.stringify({...user, ...form}));
@@ -48,7 +47,8 @@ const Profile = () => {
         },
         withCredentials: true
       });
-
+    
+    alert("Ditt konto har raderats");
     localStorage.clear();
     navigate('/login');
         }catch(err){

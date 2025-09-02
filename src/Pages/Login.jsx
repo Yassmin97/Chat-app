@@ -11,7 +11,6 @@ const Login = () => {
 
     const handleChange = e => {
         setForm({...form, [e.target.name]: e.target.value});
-
     }
 
   const handleSubmit = async (e) => {
@@ -19,11 +18,9 @@ const Login = () => {
   setError("");
 
   try {
-    
     const csrfRes = await axios.patch(
       "https://chatify-api.up.railway.app/csrf",
       {},
-      { withCredentials: true }
     );
     const csrfToken = csrfRes.data.csrfToken;
 

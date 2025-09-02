@@ -11,7 +11,6 @@ const Register = () => {
 
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
-
     };
 
     const handleSubmit = async e => {
@@ -20,11 +19,10 @@ const Register = () => {
         setSuccess("");
 
         try{
-            //hämta token
-            const csrfRes = await axios.patch('https://chatify-api.up.railway.app/csrf', {}, { withCredentials: true });
+            
+            const csrfRes = await axios.patch('https://chatify-api.up.railway.app/csrf', {},);
             const csrfToken = csrfRes.data.csrfToken;
 
-            //skicka reegister anrop
             await axios.post('https://chatify-api.up.railway.app/auth/register',
         {
             username: form.username,
@@ -34,9 +32,6 @@ const Register = () => {
             csrfToken: csrfToken,
             
         },
-    { 
-        withCredentials: true,                   
-      }
     );
 
         setSuccess("Registrering lyckades! Du skickas vidare...");
