@@ -58,7 +58,7 @@ const Chat = () => {
       });
 
       const localMsgs = JSON.parse(localStorage.getItem("messages")) || [];
-      const serverMsgs = res.data.map(m => ({ ...m, createdAt: m.createdAt || new Date().toISOString() }));
+      const serverMsgs = res.data.map(m => ({ ...m,userId: m.userId || m.user?.id, createdAt: m.createdAt || new Date().toISOString() }));
 
       const final = combineAndInterleave(serverMsgs, localMsgs);
       setMessages(final);
@@ -165,15 +165,14 @@ const Chat = () => {
     <div className="flex min-h-screen">
       <SideNav />
       <div className='flex-1 ml-40 relative'>
-        <div
-          className="absolute inset-0 z-0"
+        <div className="absolute inset-0 z-0"
           style={{
             backgroundImage: "url('/bakgrund.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}>  
         </div>
-        
+
         <div className='relative z-20 p-6 flex flex-col h-screen'>
           <div className="flex items-center gap-3 mb-6 justify-center">
             <h2 className="text-3xl font-semibold text-[#5A314E]">

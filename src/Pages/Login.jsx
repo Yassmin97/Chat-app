@@ -31,9 +31,6 @@ const Login = () => {
         password: form.password,
         csrfToken: csrfToken,
       },
-      {
-        withCredentials: true,              
-      }
     );
 
     const token = loginRes.data.token;
